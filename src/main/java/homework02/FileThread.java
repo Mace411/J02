@@ -3,9 +3,9 @@ package homework02;
 import java.io.File;
 import java.util.List;
 
-public class MyThread extends Thread{
+public class FileThread extends Thread{
 	private List<File> fList;
-	public MyThread (List<File> fList) {
+	public FileThread (List<File> fList) {
 		this.fList = fList;
 	}
 	@Override

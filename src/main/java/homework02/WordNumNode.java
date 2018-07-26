@@ -8,7 +8,6 @@ public class WordNumNode {
 	}
 	
 	public WordNumNode(String word, int num) {
-		super();
 		this.word = word;
 		this.num = num;
 	}

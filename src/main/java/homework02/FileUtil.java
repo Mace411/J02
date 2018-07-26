@@ -18,6 +18,8 @@ import javax.sound.midi.Synthesizer;
 
 public class FileUtil {
 	public static final ConcurrentHashMap<String, Integer> wordSum = new ConcurrentHashMap<>();
+	public static final List<String> wordList = new ArrayList<>();
+	public static int dieNum = 0;
 	//根据路径获取目录的全部文件
 	public static List<File> getFileList(String path) {
 		File file = new File(path);
@@ -45,6 +47,7 @@ public class FileUtil {
 	}
 	//统计单词个数
 	public static void count(List<File> files){
+		
 		InputStream is = null;
 		BufferedReader br = null;
 		for(File file : files) {
@@ -54,7 +57,9 @@ public class FileUtil {
 				String word = null;
 				while((word = br.readLine()) != null){
 					word.trim();
-					sumIncr(word);
+					synchronized (wordList) {
+						wordList.add(word);
+					}
 				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -85,7 +90,7 @@ public class FileUtil {
 		return sumList;
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		System.out.println("请输入文本文件的目录:");
 		Scanner sc = new Scanner(System.in);
 		String path = sc.next();
@@ -102,19 +107,19 @@ public class FileUtil {
 			list.get(index).add(txtFiles.get(i));
 		}
 		
-		MyThread[] mt = new MyThread[threadNum];
+		FileThread[] mt = new FileThread[threadNum];
 		for(int i = 0;i<threadNum;i++) {
-			mt[i] = new MyThread(list.get(i));
+			mt[i] = new FileThread(list.get(i));
 			mt[i].start();
 		}
+		
 		System.out.println("耗时:"+(System.currentTimeMillis()-start1)+"ms");
+		CountThread ct = new CountThread(threadNum);
+		ct.start();
 		for(int i = 0;i<threadNum;i++) {
-			try {
-				mt[i].join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			mt[i].join();
 		}
+//		ct.join();
 //		for(String key : wordSum.keySet()) {
 //			System.out.println(key +"------"+ wordSum.get(key));
 //		}
